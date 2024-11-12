@@ -71,6 +71,7 @@ export default function RecordButton({ setTranscribedText }) {
         )}
       </button>
       <p className="text-white flex justify-center ">Bas ve Konuş</p>
+
     </div>
   );
 }

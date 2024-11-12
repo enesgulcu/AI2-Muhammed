@@ -1,6 +1,7 @@
 "use client";
 import { signIn } from "next-auth/react";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Yönlendirme için
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const router = useRouter(); // Yönlendirme için useRouter kullanımı
 
   const handleLogin = async () => {
     const res = await signIn("credentials", {
@@ -20,6 +22,7 @@ const LoginPage = () => {
     if (res.ok) {
       console.log("Giriş başarılı!");
       setError(null);
+      router.push("/"); // Giriş başarılı olunca ana sayfaya yönlendirme
     } else {
       console.error("Giriş hatası:", res.error);
       setError("Giriş başarısız. E-posta veya şifre hatalı.");
