@@ -14,7 +14,7 @@ export async function POST(request) {
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "Respond in simple English, suitable for children." },
+          { role: "system", content: "Answer in simple, child-friendly English. only english" },
           { role: "user", content: transcribedText },
         ],
       }),
@@ -28,3 +28,4 @@ export async function POST(request) {
     return NextResponse.json({ aiResponse: "An error occurred." });
   }
 }
+

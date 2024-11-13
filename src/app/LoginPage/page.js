@@ -1,16 +1,17 @@
+// pages/login.js
 "use client";
 import { signIn } from "next-auth/react";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Yönlendirme için
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import toast, { Toaster } from "react-hot-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const router = useRouter(); // Yönlendirme için useRouter kullanımı
+  const router = useRouter();
 
   const handleLogin = async () => {
     const res = await signIn("credentials", {
@@ -20,18 +21,17 @@ const LoginPage = () => {
     });
 
     if (res.ok) {
-      console.log("Giriş başarılı!");
-      setError(null);
-      router.push("/"); // Giriş başarılı olunca ana sayfaya yönlendirme
+      toast.success("Giriş başarılı!"); // Show success toast
+      router.push("/"); // Redirect to the home page
     } else {
-      console.error("Giriş hatası:", res.error);
-      setError("Giriş başarısız. E-posta veya şifre hatalı.");
+      toast.error("Giriş başarısız. E-posta veya şifre hatalı."); // Show error toast
     }
   };
 
   return (
     <div>
       <Navbar />
+      <Toaster position="top-center" reverseOrder={false} /> {/* Toaster for toast notifications */}
       <div className="flex items-center justify-center min-h-screen bg-bgpage px-4">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">Giriş Yap</h2>
@@ -61,9 +61,6 @@ const LoginPage = () => {
           >
             Giriş Yap
           </button>
-          {error && (
-            <p className="text-center text-red-500 mt-4">{error}</p>
-          )}
           <p className="text-center text-gray-400 mt-6">
             Hesabınız yok mu?{" "}
             <Link href="/RegisterPage" className="text-yellow-500 hover:underline">

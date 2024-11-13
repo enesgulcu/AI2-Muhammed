@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import toast, { Toaster } from 'react-hot-toast';
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState(null);
 
   const handleRegister = async () => {
     try {
@@ -22,14 +22,13 @@ const RegisterPage = () => {
       });
 
       if (response.ok) {
-        setMessage("Kullanıcı başarıyla kaydedildi!");
+        toast.success("Kullanıcı başarıyla kaydedildi!"); // Success toast
       } else {
         const errorData = await response.json();
-        setMessage(errorData.error || "Kayıt başarısız.");
+        toast.error(errorData.error || "Kayıt başarısız. Lütfen tekrar deneyin."); 
       }
     } catch (error) {
-      console.error("Bir hata oluştu:", error);
-      setMessage("Bir hata oluştu. Lütfen tekrar deneyin.");
+      toast.error("Bir hata oluştu. Lütfen tekrar deneyin."); // Error toast
     }
   };
 
@@ -37,14 +36,11 @@ const RegisterPage = () => {
     <div className="min-h-screen bg-bgpage">
       <Navbar /> {/* Navbar */}
 
+      <Toaster position="top-center" reverseOrder={false} /> {/* Toaster for toast notifications */}
+
       <div className="flex items-center min-h-screen justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">Kayıt Ol</h2>
-          {message && (
-            <p className={`text-center mb-4 ${message.includes("başarıyla") ? "text-green-500" : "text-red-500"}`}>
-              {message}
-            </p>
-          )}
           <div className="flex flex-col gap-2 mb-4">
             <label className="text-gray-300">Ad Soyad</label>
             <input
