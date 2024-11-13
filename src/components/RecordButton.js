@@ -1,52 +1,58 @@
 "use client";
 import { useState, useRef } from "react";
-import { FaMicrophone } from "react-icons/fa";
-import { FaMicrophoneSlash } from "react-icons/fa6";
+import { toast } from "react-hot-toast";
+import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 
-export default function RecordButton({ setTranscribedText }) {
+export default function RecordButton({ setTranscribedText, isLoggedIn }) {
   const [isRecording, setIsRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
 
   const startRecording = async () => {
-    streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorderRef.current = new MediaRecorder(streamRef.current);
+    if (!isLoggedIn) {
+      toast.error("Önce giriş yapmalısınız.");
+      return;
+    }
 
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      audioChunksRef.current.push(event.data);
-    };
+    try {
+      streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(streamRef.current);
 
-    mediaRecorderRef.current.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
-      audioChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
 
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+        audioChunksRef.current = [];
 
-      console.log("Audio blob:", audioBlob);
-      const response = await fetch("/api/transcribe", {
-        method: "POST",
-        body: audioBlob,
-        headers: {
-          "Content-Type": "audio/wav",
-        },
-      });
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
 
-      if (response.ok) {
-        const data = await response.json();
-        setTranscribedText(data.text); // Transkribe edilen metni HomePage'e gönder
-        console.log("Oluşturulan Metin:", data.text);
-      } else {
-        console.error("Transkription hatası:", response.statusText);
-      }
+        try {
+          const response = await fetch("/api/transcribe", {
+            method: "POST",
+            body: audioBlob,
+            headers: { "Content-Type": "audio/wav" },
+          });
 
-      setAudioUrl(URL.createObjectURL(audioBlob));
-    };
+          if (response.ok) {
+            const data = await response.json();
+            setTranscribedText(data.text);
+          } else {
+            toast.error("Transkripsiyon hatası.");
+          }
+        } catch (error) {
+          toast.error("Transkripsiyon API çağrısı hatası.");
+        }
+      };
 
-    mediaRecorderRef.current.start();
-    setIsRecording(true);
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      toast.error("Mikrofon erişimi reddedildi.");
+    }
   };
 
   const stopRecording = () => {
@@ -70,8 +76,7 @@ export default function RecordButton({ setTranscribedText }) {
           </span>
         )}
       </button>
-      <p className="text-white flex justify-center ">Bas ve Konuş</p>
-
+      <p className="text-white">Bas ve Konuş</p>
     </div>
   );
 }

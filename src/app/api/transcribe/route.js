@@ -9,8 +9,7 @@ export async function POST(req) {
     const audioBuffer = await req.arrayBuffer();
     const audioBufferConverted = Buffer.from(audioBuffer);
 
-    console.log("Audio dosyası alındı:", audioBufferConverted);
-
+    
     // Ses dosyasını OpenAI API'ye gönder
     const formData = new FormData();
     formData.append('file', audioBufferConverted, {

@@ -13,14 +13,22 @@ const Navbar = () => {
       <div className="flex container mx-auto justify-between items-center">
         {/* Logo-isim */}
         <div className="flex items-center space-x-2">
-          <Link href="/" className="text-primary font-extrabold text-xl">İngilizce Sesli Asistan</Link>
+          <Link href="/">
+            <span className="text-primary font-extrabold text-xl">İngilizce Sesli Asistan</span>
+          </Link>
         </div>
 
         {/* Menü Linkleri */}
         <div className="hidden md:flex space-x-6 text-white text-sm">
-          <Link href="/" className="hover:text-primary">Ana Sayfa</Link>
-          <Link href="/" className="hover:text-primary">Hakkımızda</Link>
-          <Link href="/" className="hover:text-primary">Yardım</Link>
+          <Link href="/">
+            <span className="hover:text-primary">Ana Sayfa</span>
+          </Link>
+          <Link href="/">
+            <span className="hover:text-primary">Hakkımızda</span>
+          </Link>
+          <Link href="/">
+            <span className="hover:text-primary">Yardım</span>
+          </Link>
         </div>
 
         {/* Kullanıcı Girişi Kontrolü */}
@@ -42,7 +50,7 @@ const Navbar = () => {
                   <FaUserPlus />
                 </span>
                 <Link href="/RegisterPage">
-                  Kayıt Ol
+                  <span>Kayıt Ol</span>
                 </Link>
               </div>
               <div className="bg-btnsecondary text-white px-4 gap-2 py-2 rounded-full hover:bg-green-700 flex">
@@ -50,7 +58,7 @@ const Navbar = () => {
                   <FaSignInAlt />
                 </span>
                 <Link href="/LoginPage">
-                  Giriş Yap
+                  <span>Giriş Yap</span>
                 </Link>
               </div>
             </>
@@ -66,9 +74,15 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden flex flex-col items-center space-y-4 mt-4 text-white text-sm">
-          <Link href="/" className="hover:text-primary">Ana Sayfa</Link>
-          <Link href="/" className="hover:text-primary">Hakkımızda</Link>
-          <Link href="/" className="hover:text-primary">Yardım</Link>
+          <Link href="/">
+            <span className="hover:text-primary">Ana Sayfa</span>
+          </Link>
+          <Link href="/">
+            <span className="hover:text-primary">Hakkımızda</span>
+          </Link>
+          <Link href="/">
+            <span className="hover:text-primary">Yardım</span>
+          </Link>
           {session ? (
             <div className="flex flex-col items-center space-y-2">
               <span className="text-white">{session.user.email}</span>
@@ -86,7 +100,7 @@ const Navbar = () => {
                   <FaUserPlus />
                 </span>
                 <Link href="/RegisterPage">
-                  Kayıt Ol
+                  <span>Kayıt Ol</span>
                 </Link>
               </div>
               <div className="bg-btnsecondary text-white px-4 gap-2 py-2 rounded-full hover:bg-green-700 flex">
@@ -94,7 +108,7 @@ const Navbar = () => {
                   <FaSignInAlt />
                 </span>
                 <Link href="/LoginPage">
-                  Giriş Yap
+                  <span>Giriş Yap</span>
                 </Link>
               </div>
             </>
