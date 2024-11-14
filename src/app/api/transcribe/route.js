@@ -1,47 +1,41 @@
-import fetch from 'node-fetch';
+import axios from 'axios';
 import FormData from 'form-data';
 
 export async function POST(req) {
   try {
-    // Gelen ses dosyasını alıp Buffer formatına dönüştürelim
+    // Convert the incoming audio data to a Buffer
     const audioBuffer = await req.arrayBuffer();
     const audioBufferConverted = Buffer.from(audioBuffer);
 
-    
-    // Ses dosyasını OpenAI API'ye gönder
+    // Prepare FormData for Whisper API request
     const formData = new FormData();
     formData.append('file', audioBufferConverted, {
-      filename: 'audio.wav',
-      contentType: 'audio/wav',
+      filename: 'audio.wav', // Specify file name and format
     });
-    formData.append('model', 'whisper-1'); // Whisper modelini burada ekledik
+    formData.append('model', 'whisper-1');
 
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
+    // Set headers explicitly, including boundary and content-length
+    const response = await axios.post('https://api.openai.com/v1/audio/transcriptions', formData, {
       headers: {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        ...formData.getHeaders() // FormData'nın gerekli header'ları otomatik ayarlamasını sağlıyoruz
+        'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
+        'Content-Length': formData.getLengthSync(), // Calculate content length
       },
-      body: formData,
     });
 
-    const result = await response.json();
-   
-
-    if (response.ok) {
-      return new Response(JSON.stringify({ text: result.text }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    } else {
-      return new Response(
-        JSON.stringify({ error: result.error.message }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    // Return transcription text as JSON
+    return new Response(JSON.stringify({ text: response.data.text }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
+    // Capture detailed error message
+    const errorMessage = error.response?.data?.error?.message || "Server error";
+    console.error("API Error:", errorMessage);
+
+    // Return error response
     return new Response(
-      JSON.stringify({ error: 'Sunucu hatası', details: error.message }),
+      JSON.stringify({ error: 'Transcription error', details: errorMessage }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
