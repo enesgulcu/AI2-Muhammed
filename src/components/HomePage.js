@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Toaster, toast } from "react-hot-toast";
@@ -23,12 +24,34 @@ export default function HomePage() {
     setTranscribedText("");
     setAiResponse("");
     setAudioUrl("");
-    setSelectedVoice("onwK4e9ZLuTAKqWW03F9");
   };
 
   useEffect(() => {
     resetStates();
   }, []);
+
+  useEffect(() => {
+    if (aiResponse) {
+      saveSpeechToDatabase();
+    }
+  }, [aiResponse]);
+
+  const saveSpeechToDatabase = async () => {
+    try {
+      const response = await fetch("/api/saveSpeech", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcribedText, aiResponse }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Konuşma verisi kaydedilemedi.");
+      } 
+    } catch (error) {
+      console.error("Veritabanına kaydetme hatası:", error);
+      toast.error("Konuşma verisi kaydedilemedi.");
+    }
+  };
 
   const handleSendToChatGPT = async (text) => {
     try {
@@ -37,14 +60,19 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcribedText: text }),
       });
+
       if (response.ok) {
         const data = await response.json();
+        // `aiResponse` güncelleniyor
         setAiResponse(data.aiResponse);
+
+        // Yanıtı metin seslendirme API'sine gönder
         await handleTextToSpeech(data.aiResponse);
       } else {
         toast.error("ChatGPT API çağrısı başarısız.");
       }
     } catch (error) {
+      console.error("ChatGPT API çağrısı hatası:", error);
       toast.error("ChatGPT API çağrısı hatası.");
     }
   };
@@ -65,6 +93,7 @@ export default function HomePage() {
         toast.error("Text-to-speech API çağrısı başarısız.");
       }
     } catch (error) {
+      console.error("Text-to-speech API çağrısı hatası:", error);
       toast.error("Text-to-speech API çağrısı hatası.");
     }
   };
@@ -77,7 +106,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-bgpage min-h-screen flex flex-col pb-28 overflow-hidden">
-      <Toaster position="top-center" reverseOrder={false} /> {/* Toast notifications */}
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="max-w-md w-1/3 mx-auto flex items-center space-x-2 my-5">
         <label htmlFor="voiceSelect" className="text-md text-gray-500">Ses Seçin:</label>
         <select

@@ -3,8 +3,6 @@ import FormData from 'form-data';
 
 export async function POST(req) {
   try {
-    console.log("Gelen istek başlıkları:", req.headers);
-
     // Gelen ses dosyasını alıp Buffer formatına dönüştürelim
     const audioBuffer = await req.arrayBuffer();
     const audioBufferConverted = Buffer.from(audioBuffer);

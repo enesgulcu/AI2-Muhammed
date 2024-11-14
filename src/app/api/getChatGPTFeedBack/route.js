@@ -14,7 +14,7 @@ export async function POST(request) {
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "Answer in simple, child-friendly English. only english" },
+          { role: "system", content: "Answer in simple, friendly English that is easy for children to understand. Use short sentences and easy words. Only answer in English. like a human speak" },
           { role: "user", content: transcribedText },
         ],
       }),
