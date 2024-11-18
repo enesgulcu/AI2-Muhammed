@@ -2,9 +2,8 @@
 
 import { NextResponse } from "next/server";
 
-// Basit dil kontrolü fonksiyonu
+// Metnin İngilizce olup olmadığını kontrol eden fonksiyon
 function isEnglish(text) {
-  // İngilizce karakterler içeriyorsa true döndür
   return /^[a-zA-Z0-9.,!? ]*$/.test(text);
 }
 
@@ -19,6 +18,7 @@ export async function POST(request) {
       return NextResponse.json({ translatedText: text });
     }
 
+    // Çeviri işlemi
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -28,10 +28,11 @@ export async function POST(request) {
       body: JSON.stringify({
         model: "gpt-4",
         messages: [
-          { role: "system", content: "Translate the following text to English." },
+          { role: "system", content: "You are a translation assistant. translate to English" },
           { role: "user", content: text }
         ],
-        max_tokens: 100,
+        max_tokens: 150, // Daha uzun cevaplar için token limiti artırıldı
+        temperature: 0,  // Daha kararlı ve tahmin edilebilir sonuçlar için 0 yapıldı
       }),
     });
 
@@ -49,7 +50,7 @@ export async function POST(request) {
     const translatedText = data.choices[0].message.content.trim();
     console.log("Çevrilen metin:", translatedText);
     return NextResponse.json({ translatedText });
-    
+
   } catch (error) {
     console.error("Çeviri API hatası:", error);
     return NextResponse.json({ error: "Çeviri yapılamadı" }, { status: 500 });
