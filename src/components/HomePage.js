@@ -111,10 +111,26 @@ export default function HomePage() {
   const stripSSMLTags = (ssmlText) =>
     ssmlText.replace(/<\/?[^>]+(>|$)|```ssml|```/g, "").trim();
 
+  // Add example phrases list
+  const examplePhrases = [
+    "Hello, how are you?",
+    "What's your favorite color?",
+    "Can you tell me a story?",
+    "I want to learn about animals!",
+    "What is your name ?"
+  ];
+
+  // Function to handle example phrase click
+  const handleExamplePhraseClick = (phrase) => {
+    addMessageToHistory(phrase, true); // Adds the phrase to conversation as if user sent it
+    handleSendToChatGPT(phrase); // Sends phrase to ChatGPT
+  };
+
   return (
     <div className="bg-bgpage min-h-screen flex flex-col pb-28 overflow-hidden">
       <Toaster position="top-center" reverseOrder={false} />
 
+      {/* Voice Selector */}
       <div className="max-w-md w-1/3 mx-auto flex items-center space-x-2 my-5">
         <label htmlFor="voiceSelect" className="text-md text-gray-500">Ses Seçin:</label>
         <select
@@ -130,25 +146,29 @@ export default function HomePage() {
           ))}
         </select>
       </div>
-
       <RecordButton setTranscribedText={setTranscribedText} isLoggedIn={!!session} />
 
-      <div className="bg-secondary h-72 mx-16 rounded-md p-5 flex flex-col gap-4 overflow-y-auto">
-        {conversationHistory.length > 0 ? (
-          [...conversationHistory].reverse().map((message, index) => (
-            <div
-              key={index}
-              className={`mt-2 p-2 rounded-md ${message.role === "user" ? "bg-bgpage text-left" : "bg-third text-right"
-                }`}
-            >
-              {message.content}
-            </div>
-          ))
-        ) : (
-          <span>Sohbet Başlatın</span>
-        )}
+      {/* Conversation History */}
+      <div className="flex items-center justify-center">
+        <div className="bg-secondary h-72 w-2/5 rounded-3xl p-5 flex flex-col gap-2 overflow-y-auto">
+          {conversationHistory.length > 0 ? (
+            [...conversationHistory].reverse().map((message, index) => (
+              <div
+                key={index}
+                className={`mt-2 p-3 rounded-md ${message.role === "user" ? "bg-bgpage text-left self-start" : "bg-third text-left self-end"
+                  }`}
+              >
+                {message.content}
+              </div>
+            ))
+          ) : (
+            <span>Start a conversation</span>
+          )}
+        </div>
       </div>
 
+
+      {/* Audio Player */}
       {audioUrl && (
         <div className="my-4 mx-16 p-4 bg-bgpage rounded-lg shadow-lg">
           <audio
@@ -160,6 +180,19 @@ export default function HomePage() {
           />
         </div>
       )}
+
+      {/* Example Phrases */}
+      <div className="flex justify-center space-x-3 mt-10 ">
+        {examplePhrases.map((phrase, index) => (
+          <button
+            key={index}
+            onClick={() => handleExamplePhraseClick(phrase)}
+            className="px-4 text-lg py-2 bg-third text-white rounded-lg shadow-md hover:bg-bgpage focus:outline-none focus:ring-2 focus:ring-offset-2"
+          >
+            {phrase}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
